@@ -14,18 +14,18 @@ export const PuzzleProvider = ({ children }) => {
   const [feedback, setFeedback] = useState(null);
   const [dailyCooldown, setDailyCooldown] = useState(0);
 
-  // Psychologically engaging feedback messages
+  // Psychologically engaging feedback messages (Somali)
   const nearMissMessages = [
-    "You're very close!",
-    "Most people miss this detail",
-    "Try one more time, you've got this",
-    "Almost correct, look closer"
+    "Aad baad ugu dhawdahay!",
+    "Dadka intooda badan way ku khaldamaan faahfaahintan",
+    "Isku day mar kale, waad awoodaa",
+    "Ugu dhawaan waa sax, si fiican u eeg"
   ];
 
   const retryMessages = [
-    "Don't give up now!",
-    "You've invested time, keep going",
-    "Just a small twist left to solve"
+    "Hadda ha is dhiibin!",
+    "Waqti ayaad gelisay, sii wad",
+    "Xoogaa yar ayaa dhiman si aad u xalliso"
   ];
 
   const submitAnswer = async (answer) => {
@@ -33,11 +33,19 @@ export const PuzzleProvider = ({ children }) => {
 
     setAttempts(prev => prev + 1);
     
-    const isCorrect = answer.toLowerCase().trim() === activePuzzle.answer.toLowerCase().trim();
+    const normalizedUserAnswer = answer.toLowerCase().trim();
+    
+    // Check if answer is an array or string
+    let isCorrect = false;
+    if (Array.isArray(activePuzzle.answer)) {
+      isCorrect = activePuzzle.answer.some(ans => ans.toLowerCase().trim() === normalizedUserAnswer);
+    } else {
+      isCorrect = normalizedUserAnswer === activePuzzle.answer.toLowerCase().trim();
+    }
 
     if (isCorrect) {
       setIsSolved(true);
-      setFeedback({ type: 'success', message: 'Incredible! You solved it!' });
+      setFeedback({ type: 'success', message: 'Cajiib! Waad xallisay!' });
       
       // Micro-rewards: Confetti
       confetti({
@@ -58,7 +66,7 @@ export const PuzzleProvider = ({ children }) => {
       if (bonus > 0) {
         setFeedback(prev => ({ 
           ...prev, 
-          bonusMessage: `Lucky bonus +${bonus} points!` 
+          bonusMessage: `Nasiib wanaagsan! +${bonus} dhibcood dheeraad ah!` 
         }));
       }
     } else {

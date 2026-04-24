@@ -11,16 +11,16 @@ const FreePlay = () => {
 
   const puzzles = {
     Fudud: [
-      { id: 'e1', question: 'Waa maxay waxa leh furayaal laakiin aan quful lahayn?', answer: 'Kiboodhka', type: 'Qiso (Riddle)', difficulty: 'Fudud', explanation: 'Kiboodhka (Keyboard) wuxuu leeyahay furayaal laakiin waxba ma qufulo.' },
-      { id: 'e2', question: 'Waxaan ku hadlaa af la\'aan, waxaanna wax ku maqlaa dhego la\'aan. Waa maxay?', answer: 'Dhawaaq', type: 'Qiso (Riddle)', difficulty: 'Fudud', explanation: 'Dhawaaqa dib u soo noqda (Echo) ma laha xubno laakiin wuu hadlaa wuuna maqlaa.' },
+      { id: 'e1', question: 'Waa maxay waxa leh furayaal laakiin aan quful lahayn?', answer: ['Kiboodhka', 'Keyboard', 'Kiboodh'], type: 'Qiso (Riddle)', difficulty: 'Fudud', explanation: 'Kiboodhka (Keyboard) wuxuu leeyahay furayaal laakiin waxba ma qufulo.' },
+      { id: 'e2', question: 'Waxaan ku hadlaa af la\'aan, waxaanna wax ku maqlaa dhego la\'aan. Waa maxay?', answer: ['Dhawaaq', 'Echo', 'Shanqadh'], type: 'Qiso (Riddle)', difficulty: 'Fudud', explanation: 'Dhawaaqa dib u soo noqda (Echo) ma laha xubno laakiin wuu hadlaa wuuna maqlaa.' },
     ],
     Dhexdhexaad: [
-      { id: 'm1', question: 'Soo hel lambarka xiga: 2, 6, 12, 20, ?', answer: '30', type: 'Xisaab (Sequence)', difficulty: 'Dhexdhexaad', explanation: 'Farqiga u dhexeeya lambarada wuxuu kordhayaa 2: +4, +6, +8, markaa kan xiga waa +10 (20 + 10 = 30).' },
-      { id: 'm2', question: 'Nin ayaa eegaya sawir. Wuxuu yiri "Walaalo ma lihi, laakiin ninka sawirka ku jira aabihiis waa aabahay wiilkiisa." Waa kuma qofka sawirka ku jira?', answer: 'Wiilkiisa', type: 'Mantiq (Logic)', difficulty: 'Dhexdhexaad', explanation: '"Aabahay wiilkiisa" maadaama uusan walaalo lahayn, waa isaga. Marka "ninkan aabihiis waa aniga", sawirku waa wiilkiisa.' },
+      { id: 'm1', question: 'Soo hel lambarka xiga: 2, 6, 12, 20, ?', answer: ['30'], type: 'Xisaab (Sequence)', difficulty: 'Dhexdhexaad', explanation: 'Farqiga u dhexeeya lambarada wuxuu kordhayaa 2: +4, +6, +8, markaa kan xiga waa +10 (20 + 10 = 30).' },
+      { id: 'm2', question: 'Nin ayaa eegaya sawir. Wuxuu yiri "Walaalo ma lihi, laakiin ninka sawirka ku jira aabihiis waa aabahay wiilkiisa." Waa kuma qofka sawirka ku jira?', answer: ['Wiilkiisa', 'His son', 'Son'], type: 'Mantiq (Logic)', difficulty: 'Dhexdhexaad', explanation: '"Aabahay wiilkiisa" maadaama uusan walaalo lahayn, waa isaga. Marka "ninkan aabihiis waa aniga", sawirku waa wiilkiisa.' },
     ],
     Adag: [
-      { id: 'h1', question: 'Noolo ma ihi, laakiin waan koraa; sanbabo ma lihi, laakiin hawo ayaan u baahnahay; af ma lihi, laakiin biyaha ayaa i dila. Waa maxay?', answer: 'Dab', type: 'Mantiq (Lateral)', difficulty: 'Adag', explanation: 'Dabku wuu koraa, oksijiin buu u baahan yahay, biyuhuna way baabiiyaan.' },
-      { id: 'h2', question: 'Waa maxay waxa isla marka aad magaciisa sheegto baaba\'a?', answer: 'Aamusnaan', type: 'Mantiq (Lateral)', difficulty: 'Adag', explanation: 'Marka aad hadasho, aamusnaanta (Silence) way jabtaa.' },
+      { id: 'h1', question: 'Noolo ma ihi, laakiin waan koraa; sanbabo ma lihi, laakiin hawo ayaan u baahnahay; af ma lihi, laakiin biyaha ayaa i dila. Waa maxay?', answer: ['Dab', 'Fire'], type: 'Mantiq (Lateral)', difficulty: 'Adag', explanation: 'Dabku wuu koraa, oksijiin buu u baahan yahay, biyuhuna way baabiiyaan.' },
+      { id: 'h2', question: 'Waa maxay waxa isla marka aad magaciisa sheegto baaba\'a?', answer: ['Aamusnaan', 'Silence'], type: 'Mantiq (Lateral)', difficulty: 'Adag', explanation: 'Marka aad hadasho, aamusnaanta (Silence) way jabtaa.' },
     ]
   };
 

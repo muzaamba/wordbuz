@@ -15,7 +15,7 @@ const DailyChallenge = () => {
       type: 'Mantiq (Logic)',
       difficulty: 'Dhexdhexaad',
       question: 'Waa maxay waxa qoyan marka uu ku qallajinayo?',
-      answer: 'Shukumaan',
+      answer: ['Shukumaan', 'Towel'],
       explanation: 'Shukumaanka (Towel) wuxuu nuugaa biyaha marka aad isku qallajinayso, sidaas ayuuna ku qoyaa.',
       isDaily: true
     };
