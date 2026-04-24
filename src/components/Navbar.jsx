@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutGrid, Zap, Play, Trophy, User, LogIn, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
+import AuthModal from './AuthModal';
 
 const Navbar = () => {
-  const { user, userProfile, loginWithGoogle, logout } = useAuth();
+  const { user, userProfile, logout } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const location = useLocation();
 
   const navItems = [
@@ -64,7 +66,7 @@ const Navbar = () => {
               </button>
             </div>
           ) : (
-            <button onClick={loginWithGoogle} className="btn-primary py-2 px-4 text-sm hidden md:flex">
+            <button onClick={() => setIsAuthModalOpen(true)} className="btn-primary py-2 px-4 text-sm hidden md:flex">
               Soo Gal <LogIn size={16} />
             </button>
           )}
@@ -91,6 +93,8 @@ const Navbar = () => {
           })}
         </div>
       </div>
+      
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </header>
   );
 };

@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import { Trophy, Play, Users, Zap, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import AdUnit from '../components/AdUnit';
+import AuthModal from '../components/AuthModal';
 
 const Home = () => {
-  const { loginWithGoogle, user } = useAuth();
+  const { user } = useAuth();
   const [timeLeft, setTimeLeft] = useState('');
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -44,7 +46,7 @@ const Home = () => {
         {!user && (
           <div className="pt-4 flex justify-center">
             <button 
-              onClick={loginWithGoogle}
+              onClick={() => setIsAuthModalOpen(true)}
               className="btn-primary text-lg px-8 py-4"
             >
               Bilow Safarkaaga <ChevronRight size={20} />
@@ -143,6 +145,8 @@ const Home = () => {
           </div>
         ))}
       </div>
+      
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 };

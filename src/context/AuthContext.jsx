@@ -83,17 +83,36 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const loginWithGoogle = async () => {
+  const login = async (email, password) => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error("Login Error:", error);
+      return { data: null, error };
+    }
+  };
+
+  const signup = async (email, password, fullName) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
         options: {
-          redirectTo: window.location.origin
+          data: {
+            full_name: fullName,
+          }
         }
       });
       if (error) throw error;
+      return { data, error: null };
     } catch (error) {
-      console.error("Google Login Error:", error);
+      console.error("Signup Error:", error);
+      return { data: null, error };
     }
   };
 
@@ -126,7 +145,8 @@ export const AuthProvider = ({ children }) => {
     user,
     userProfile,
     loading,
-    loginWithGoogle,
+    login,
+    signup,
     logout,
     updatePoints
   };
