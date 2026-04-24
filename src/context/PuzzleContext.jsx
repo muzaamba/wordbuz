@@ -7,7 +7,7 @@ const PuzzleContext = createContext();
 export const usePuzzles = () => useContext(PuzzleContext);
 
 export const PuzzleProvider = ({ children }) => {
-  const { userProfile, updatePoints } = useAuth();
+  const { userProfile, recordPuzzleResult } = useAuth();
   const [activePuzzle, setActivePuzzle] = useState(null);
   const [attempts, setAttempts] = useState(0);
   const [isSolved, setIsSolved] = useState(false);
@@ -61,7 +61,12 @@ export const PuzzleProvider = ({ children }) => {
       const bonus = Math.random() > 0.8 ? 10 : 0;
       const totalAward = basePoints + bonus;
       
-      await updatePoints(totalAward);
+      await recordPuzzleResult({
+        pointsEarned: totalAward,
+        isSolved: true,
+        isDaily: activePuzzle.isDaily || false,
+        attemptsUsed: attempts + 1
+      });
       
       if (bonus > 0) {
         setFeedback(prev => ({ 
@@ -76,6 +81,14 @@ export const PuzzleProvider = ({ children }) => {
         : retryMessages[Math.floor(Math.random() * retryMessages.length)];
       
       setFeedback({ type: 'error', message });
+
+      // Record failed attempt
+      await recordPuzzleResult({
+        pointsEarned: 0,
+        isSolved: false,
+        isDaily: activePuzzle.isDaily || false,
+        attemptsUsed: attempts + 1
+      });
 
       // Daily Challenge Cooldown Logic (Simulated)
       if (activePuzzle.isDaily && attempts >= 1) {

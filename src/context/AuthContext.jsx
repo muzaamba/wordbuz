@@ -121,23 +121,40 @@ export const AuthProvider = ({ children }) => {
     if (error) console.error("Logout Error:", error);
   };
 
-  const updatePoints = async (amount) => {
+  const recordPuzzleResult = async ({ pointsEarned = 0, isSolved = false, isDaily = false, attemptsUsed = 1 }) => {
     if (!user || !userProfile) return;
     
-    // In Supabase, usually you use an RPC call to safely increment, 
-    // but for simplicity, we do a read-then-write or just add to current if RLS allows.
-    // Assuming RLS allows update for the user's row:
-    const newPoints = userProfile.points + amount;
-    
+    // Calculate new accuracy
+    const newTotalAttempts = (userProfile.total_attempts || 0) + 1;
+    const currentCorrect = Math.round(((userProfile.total_attempts || 0) * (userProfile.accuracy || 0)) / 100);
+    const newAccuracy = Math.round(((currentCorrect + (isSolved ? 1 : 0)) / newTotalAttempts) * 100);
+
+    const updates = {
+      points: (userProfile.points || 0) + pointsEarned,
+      total_attempts: newTotalAttempts,
+      accuracy: newAccuracy,
+      last_active: new Date().toISOString()
+    };
+
+    if (isDaily) {
+      updates.daily_entries = (userProfile.daily_entries || 0) + 1;
+      if (isSolved) {
+        updates.streak = (userProfile.streak || 0) + 1;
+      }
+    }
+
+    // Optimistic UI update
+    setUserProfile(prev => ({ ...prev, ...updates }));
+
     const { error } = await supabase
       .from('users')
-      .update({ points: newPoints })
+      .update(updates)
       .eq('uid', user.id);
       
     if (error) {
-      console.error('Error updating points:', error);
-    } else {
-      setUserProfile(prev => ({ ...prev, points: newPoints }));
+      console.error('Error updating puzzle stats:', error);
+      // Revert if error (optional, but good practice)
+      fetchUserProfile(user.id);
     }
   };
 
@@ -148,7 +165,7 @@ export const AuthProvider = ({ children }) => {
     login,
     signup,
     logout,
-    updatePoints
+    recordPuzzleResult
   };
 
   return (
