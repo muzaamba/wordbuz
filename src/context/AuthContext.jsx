@@ -1,0 +1,139 @@
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { supabase } from '../services/supabase';
+
+const AuthContext = createContext();
+
+export const useAuth = () => useContext(AuthContext);
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check active sessions and sets the user
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      } else {
+        setLoading(false);
+      }
+    });
+
+    // Listen for changes on auth state
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      } else {
+        setUserProfile(null);
+        setLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchUserProfile = async (uid) => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('uid', uid)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "Row not found"
+        console.error('Error fetching user profile:', error);
+      }
+
+      if (data) {
+        setUserProfile(data);
+      } else {
+        // Create profile if it doesn't exist
+        const newProfile = {
+          uid,
+          username: user?.user_metadata?.full_name || 'PuzzleMaster',
+          points: 0,
+          streak: 0,
+          total_attempts: 0,
+          referrals: 0,
+          daily_entries: 0,
+          accuracy: 0,
+          last_active: new Date().toISOString(),
+          referral_code: Math.random().toString(36).substring(7).toUpperCase()
+        };
+        
+        const { data: insertedData, error: insertError } = await supabase
+          .from('users')
+          .insert([newProfile])
+          .select()
+          .single();
+          
+        if (insertError) {
+          console.error('Error creating user profile:', insertError);
+        } else {
+          setUserProfile(insertedData);
+        }
+      }
+    } catch (err) {
+      console.error('Unexpected error fetching profile:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      if (error) throw error;
+    } catch (error) {
+      console.error("Google Login Error:", error);
+    }
+  };
+
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) console.error("Logout Error:", error);
+  };
+
+  const updatePoints = async (amount) => {
+    if (!user || !userProfile) return;
+    
+    // In Supabase, usually you use an RPC call to safely increment, 
+    // but for simplicity, we do a read-then-write or just add to current if RLS allows.
+    // Assuming RLS allows update for the user's row:
+    const newPoints = userProfile.points + amount;
+    
+    const { error } = await supabase
+      .from('users')
+      .update({ points: newPoints })
+      .eq('uid', user.id);
+      
+    if (error) {
+      console.error('Error updating points:', error);
+    } else {
+      setUserProfile(prev => ({ ...prev, points: newPoints }));
+    }
+  };
+
+  const value = {
+    user,
+    userProfile,
+    loading,
+    loginWithGoogle,
+    logout,
+    updatePoints
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
+};
