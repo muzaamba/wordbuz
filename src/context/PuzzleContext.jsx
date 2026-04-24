@@ -55,7 +55,7 @@ export const PuzzleProvider = ({ children }) => {
       });
 
       // Award points
-      const basePoints = activePuzzle.difficulty === 'Easy' ? 5 : activePuzzle.difficulty === 'Medium' ? 10 : 25;
+      const basePoints = activePuzzle.difficulty === 'Fudud' ? 5 : activePuzzle.difficulty === 'Dhexdhexaad' ? 10 : 25;
       
       // Variable Reward System (Dopamine loop)
       const bonus = Math.random() > 0.8 ? 10 : 0;
