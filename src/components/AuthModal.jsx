@@ -1,169 +1,162 @@
+// src/components/AuthModal.jsx
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Mail, Lock, User, Eye, EyeOff, Gamepad2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { X, Mail, Lock, User as UserIcon } from 'lucide-react';
 
-const AuthModal = ({ isOpen, onClose }) => {
-  const { login, signup } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
+export default function AuthModal() {
+  const { authModal, closeAuth, signIn, signUp } = useAuth();
+  const [mode, setMode] = useState(authModal.mode || 'login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState('');
+  const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  if (!isOpen) return null;
+  React.useEffect(() => { setMode(authModal.mode || 'login'); }, [authModal.mode]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
-    let result;
-    if (isLogin) {
-      result = await login(email, password);
-    } else {
-      if (!fullName) {
-        setError('Fadlan gali magacaaga oo buuxa.');
-        setLoading(false);
-        return;
-      }
-      result = await signup(email, password, fullName);
-    }
-
-    setLoading(false);
-
-    if (result.error) {
-      // Map common Supabase errors to Somali or simple text
-      if (result.error.message.includes('Invalid login credentials')) {
-         setError('Email-ka ama Password-ka waa khalad.');
-      } else if (result.error.message.includes('User already registered')) {
-         setError('Email-kan horay ayaa loo diiwaangeliyay.');
-      } else if (result.error.message.includes('Password should be at least')) {
-         setError('Password-ku waa inuu ahaadaa ugu yaraan 6 xaraf.');
+    try {
+      if (mode === 'login') {
+        const { error } = await signIn(email, password);
+        if (error) setError(error.message);
       } else {
-         setError(result.error.message);
+        if (!username.trim()) { setError('Username is required'); setLoading(false); return; }
+        const { error } = await signUp(email, password, username);
+        if (error) setError(error.message);
       }
-    } else {
-      if (!isLogin && result.data?.user?.identities?.length === 0) {
-        setError('Email-kan horay ayaa loo diiwaangeliyay.');
-        return;
-      }
-      onClose(); // Close modal on success
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden relative">
-        <button 
-          onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
-        >
-          <X size={24} />
-        </button>
-        
-        <div className="p-8">
-          <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-brand-600 rounded-xl flex items-center justify-center font-bold text-white text-xl mx-auto mb-4 shadow-sm">
-              P
+    <AnimatePresence>
+      {authModal.open && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={closeAuth}
+          />
+          {/* Modal */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            className="relative w-full max-w-md glass-card p-8"
+            style={{ border: '1px solid rgba(0,207,255,0.2)' }}
+          >
+            {/* Glow */}
+            <div className="absolute -inset-px rounded-xl overflow-hidden pointer-events-none">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-px bg-gradient-to-r from-transparent via-neon-blue to-transparent opacity-60" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900">
-              {isLogin ? 'Ku Soo Dhowow' : 'Sameyso Akoon Cusub'}
-            </h2>
-            <p className="text-slate-600 mt-2">
-              {isLogin ? 'Geli xogtaada si aad u gasho akoonkaaga.' : 'Ku biir ciyaartoyda maanta oo hel dhibco.'}
-            </p>
-          </div>
 
-          {error && (
-            <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg text-center">
-              {error}
+            {/* Close */}
+            <button onClick={closeAuth} className="absolute top-4 right-4 text-text-muted hover:text-white transition-colors">
+              <X size={20} />
+            </button>
+
+            {/* Logo */}
+            <div className="flex flex-col items-center mb-6">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3"
+                style={{ background: 'linear-gradient(135deg, #00CFFF20, #7A5CFF20)', border: '1px solid rgba(0,207,255,0.3)' }}>
+                <Gamepad2 size={24} className="text-neon-blue" />
+              </div>
+              <h2 className="text-xl font-gaming font-bold gradient-text">GAMEZEWENO</h2>
+              <p className="text-text-secondary text-sm font-body mt-1">
+                {mode === 'login' ? 'Welcome back, gamer!' : 'Join the gaming community'}
+              </p>
             </div>
-          )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Magaca Buuxa</label>
+            {/* Tabs */}
+            <div className="flex rounded-lg overflow-hidden mb-6" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+              {['login', 'register'].map(m => (
+                <button
+                  key={m}
+                  onClick={() => { setMode(m); setError(''); }}
+                  className="flex-1 py-2.5 text-sm font-semibold font-body transition-all duration-200 capitalize"
+                  style={{
+                    background: mode === m ? 'rgba(0,207,255,0.15)' : 'transparent',
+                    color: mode === m ? '#00CFFF' : '#606060',
+                  }}
+                >
+                  {m === 'login' ? 'Sign In' : 'Register'}
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {mode === 'register' && (
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <UserIcon size={18} className="text-slate-400" />
-                  </div>
+                  <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
                   <input
                     type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-slate-900 bg-white"
-                    placeholder="Magacaaga..."
+                    placeholder="Username"
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+                    className="input-gaming pl-9"
+                    required
                   />
                 </div>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+              )}
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail size={18} className="text-slate-400" />
-                </div>
+                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
                 <input
                   type="email"
+                  placeholder="Email address"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-slate-900 bg-white"
-                  placeholder="email@example.com"
+                  onChange={e => setEmail(e.target.value)}
+                  className="input-gaming pl-9"
                   required
                 />
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock size={18} className="text-slate-400" />
-                </div>
+                <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
                 <input
-                  type="password"
+                  type={showPass ? 'text' : 'password'}
+                  placeholder="Password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-slate-900 bg-white"
-                  placeholder="••••••••"
+                  onChange={e => setPassword(e.target.value)}
+                  className="input-gaming pl-9 pr-10"
                   required
                   minLength={6}
                 />
+                <button type="button" onClick={() => setShowPass(!showPass)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-white transition-colors">
+                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full btn-primary py-3 flex justify-center items-center mt-6"
-            >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              ) : (
-                isLogin ? 'Gal Akoonka' : 'Diiwaangeli'
+              {error && (
+                <div className="px-3 py-2 rounded-lg text-sm font-body text-red-400 bg-red-500/10 border border-red-500/20">
+                  {error}
+                </div>
               )}
-            </button>
-          </form>
 
-          <div className="mt-6 text-center text-sm text-slate-600 border-t border-slate-100 pt-6">
-            {isLogin ? "Miyaadan lahayn akoon? " : "Miyuu kuu furan yahay akoon? "}
-            <button
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setError('');
-              }}
-              className="text-brand-600 font-bold hover:underline ml-1"
-            >
-              {isLogin ? 'Is-diiwaangeli' : 'Soo Gal'}
-            </button>
-          </div>
+              <button type="submit" disabled={loading} className="btn-primary w-full mt-2">
+                <span>{loading ? 'Loading...' : mode === 'login' ? 'Sign In' : 'Create Account'}</span>
+              </button>
+            </form>
+
+            <p className="text-center text-text-muted text-xs font-body mt-4">
+              {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
+              <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
+                className="text-neon-blue hover:underline">
+                {mode === 'login' ? 'Register' : 'Sign In'}
+              </button>
+            </p>
+          </motion.div>
         </div>
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
-};
-
-export default AuthModal;
+}

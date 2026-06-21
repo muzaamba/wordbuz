@@ -2,45 +2,359 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Base Reset & Global Styles ─── */
 @layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
   body {
-    font-family: 'Inter', sans-serif;
-    background-color: #f8fafc; /* Very light slate for professional look */
-    color: #0f172a;
+    font-family: 'Exo 2', 'Inter', sans-serif;
+    background-color: #0A0A0A;
+    color: #F0F0F0;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', 'Exo 2', sans-serif;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  ::selection {
+    background: rgba(0, 207, 255, 0.3);
+    color: #00CFFF;
   }
 }
 
+/* ─── Custom Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0A0A0A;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #00CFFF, #7A5CFF);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #00CFFF, #00FF99);
+}
+
+/* ─── Component Classes ─── */
 @layer components {
-  /* Clean, professional card - no glass blur, no glows */
-  .clean-card {
-    @apply bg-white border border-slate-200 rounded-xl p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow duration-200;
-  }
 
-  /* Solid, accessible primary button */
+  /* === Buttons === */
   .btn-primary {
-    @apply bg-brand-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-brand-900 transition-colors duration-200 flex items-center justify-center gap-2;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm font-body transition-all duration-300 cursor-pointer;
+    background: linear-gradient(135deg, #00CFFF, #7A5CFF);
+    color: #0A0A0A;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 207, 255, 0.3);
   }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #7A5CFF, #00CFFF);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .btn-primary:hover::before { opacity: 1; }
+  .btn-primary:hover {
+    box-shadow: 0 0 30px rgba(0, 207, 255, 0.5), 0 0 60px rgba(122, 92, 255, 0.3);
+    transform: translateY(-2px);
+  }
+  .btn-primary span { position: relative; z-index: 1; }
 
-  /* Subtle secondary button */
   .btn-secondary {
-    @apply bg-white border border-slate-300 text-slate-700 font-semibold py-3 px-6 rounded-lg hover:bg-slate-50 transition-colors duration-200 flex items-center justify-center gap-2;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm font-body transition-all duration-300 cursor-pointer;
+    background: transparent;
+    color: #00CFFF;
+    border: 1px solid rgba(0, 207, 255, 0.4);
+  }
+  .btn-secondary:hover {
+    background: rgba(0, 207, 255, 0.1);
+    border-color: #00CFFF;
+    box-shadow: 0 0 20px rgba(0, 207, 255, 0.2);
+    transform: translateY(-2px);
   }
 
-  /* Modern input field */
-  .input-field {
-    @apply w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all;
+  .btn-green {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm font-body transition-all duration-300 cursor-pointer;
+    background: linear-gradient(135deg, #00FF99, #00CFFF);
+    color: #0A0A0A;
+    border: none;
+    box-shadow: 0 0 20px rgba(0, 255, 153, 0.3);
+  }
+  .btn-green:hover {
+    box-shadow: 0 0 30px rgba(0, 255, 153, 0.5);
+    transform: translateY(-2px);
   }
 
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm font-body transition-all duration-300 cursor-pointer;
+    background: linear-gradient(135deg, #FF4444, #FF7A00);
+    color: #fff;
+    border: none;
+  }
+  .btn-danger:hover { transform: translateY(-2px); }
+
+  /* === Cards === */
+  .gaming-card {
+    background: #151515;
+    border: 1px solid #1E1E1E;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .gaming-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 1px;
+    background: linear-gradient(135deg, transparent, transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    transition: all 0.3s;
+  }
+  .gaming-card:hover {
+    border-color: rgba(0, 207, 255, 0.4);
+    box-shadow: 0 8px 40px rgba(0, 207, 255, 0.1), 0 4px 16px rgba(0, 0, 0, 0.8);
+    transform: translateY(-4px);
+  }
+  .gaming-card:hover::before {
+    background: linear-gradient(135deg, #00CFFF, #7A5CFF);
+  }
+
+  .glass-card {
+    background: rgba(21, 21, 21, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+  }
+
+  /* === Neon Effects === */
+  .neon-text-blue {
+    color: #00CFFF;
+    text-shadow: 0 0 10px #00CFFF80, 0 0 20px #00CFFF40;
+  }
+  .neon-text-purple {
+    color: #7A5CFF;
+    text-shadow: 0 0 10px #7A5CFF80, 0 0 20px #7A5CFF40;
+  }
+  .neon-text-green {
+    color: #00FF99;
+    text-shadow: 0 0 10px #00FF9980, 0 0 20px #00FF9940;
+  }
+  .neon-border-blue {
+    border: 1px solid rgba(0, 207, 255, 0.4);
+    box-shadow: 0 0 10px rgba(0, 207, 255, 0.2);
+  }
+  .neon-border-purple {
+    border: 1px solid rgba(122, 92, 255, 0.4);
+    box-shadow: 0 0 10px rgba(122, 92, 255, 0.2);
+  }
+  .neon-border-green {
+    border: 1px solid rgba(0, 255, 153, 0.4);
+    box-shadow: 0 0 10px rgba(0, 255, 153, 0.2);
+  }
+
+  /* === Gradient Text === */
+  .gradient-text {
+    background: linear-gradient(135deg, #00CFFF, #7A5CFF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .gradient-text-green {
+    background: linear-gradient(135deg, #00FF99, #00CFFF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* === Section & Layout === */
   .section-padding {
-    @apply pt-24 pb-12 max-sm:pt-20;
+    @apply py-16 md:py-24;
+  }
+  .container-gaming {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  .section-title {
+    @apply text-2xl md:text-3xl font-gaming font-bold;
+  }
+  .section-subtitle {
+    @apply text-text-secondary text-sm font-body mt-2;
+  }
+
+  /* === Gaming Tags / Badges === */
+  .badge-blue {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold font-body;
+    background: rgba(0, 207, 255, 0.15);
+    color: #00CFFF;
+    border: 1px solid rgba(0, 207, 255, 0.3);
+  }
+  .badge-purple {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold font-body;
+    background: rgba(122, 92, 255, 0.15);
+    color: #7A5CFF;
+    border: 1px solid rgba(122, 92, 255, 0.3);
+  }
+  .badge-green {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold font-body;
+    background: rgba(0, 255, 153, 0.15);
+    color: #00FF99;
+    border: 1px solid rgba(0, 255, 153, 0.3);
+  }
+  .badge-red {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold font-body;
+    background: rgba(255, 68, 68, 0.15);
+    color: #FF4444;
+    border: 1px solid rgba(255, 68, 68, 0.3);
+  }
+
+  /* === Input Fields === */
+  .input-gaming {
+    @apply w-full bg-surface border rounded-lg px-4 py-3 text-text-primary text-sm font-body transition-all duration-300 outline-none;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  .input-gaming::placeholder { color: #606060; }
+  .input-gaming:focus {
+    border-color: rgba(0, 207, 255, 0.5);
+    box-shadow: 0 0 0 3px rgba(0, 207, 255, 0.1);
+  }
+
+  /* === Gaming Grid Pattern Background === */
+  .bg-gaming-grid {
+    background-color: #0A0A0A;
+    background-image:
+      linear-gradient(rgba(0,207,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,207,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* === Divider === */
+  .neon-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,207,255,0.4), rgba(122,92,255,0.4), transparent);
+  }
+
+  /* === Reading Progress Bar === */
+  .reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #00CFFF, #7A5CFF, #00FF99);
+    z-index: 9999;
+    transition: width 0.1s ease;
+    box-shadow: 0 0 6px rgba(0,207,255,0.8);
+  }
+
+  /* === Star Rating === */
+  .star-filled { color: #FFD700; }
+  .star-empty { color: #333; }
+
+  /* === Category Tab === */
+  .category-tab {
+    @apply px-4 py-2 rounded-full text-sm font-semibold font-body transition-all duration-200 cursor-pointer whitespace-nowrap;
+    color: #A0A0A0;
+    border: 1px solid transparent;
+  }
+  .category-tab:hover {
+    color: #00CFFF;
+    border-color: rgba(0, 207, 255, 0.3);
+  }
+  .category-tab.active {
+    background: rgba(0, 207, 255, 0.15);
+    color: #00CFFF;
+    border-color: rgba(0, 207, 255, 0.4);
+  }
+
+  /* === Price Tag === */
+  .price-tag {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    color: #00FF99;
+    text-shadow: 0 0 8px rgba(0, 255, 153, 0.5);
   }
 }
 
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #f1f5f9; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+/* ─── Particle Canvas ─── */
+.particles-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ─── Animated Gradient Border ─── */
+.animated-border {
+  position: relative;
+  border-radius: 12px;
+}
+.animated-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  background: linear-gradient(var(--angle, 0deg), #00CFFF, #7A5CFF, #00FF99, #00CFFF);
+  animation: spin-slow 4s linear infinite;
+  z-index: -1;
+}
+
+/* ─── Skeleton Loader ─── */
+.skeleton {
+  background: linear-gradient(90deg, #151515 25%, #1E1E1E 50%, #151515 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ─── Glow Orbs ─── */
+.glow-orb-blue {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,207,255,0.15) 0%, transparent 70%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+.glow-orb-purple {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(122,92,255,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  filter: blur(40px);
+}
